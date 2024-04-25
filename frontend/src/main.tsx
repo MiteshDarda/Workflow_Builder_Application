@@ -1,11 +1,14 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './output.css'
+import './styles/output.css'
+import './styles/font-family.css'
 import { RouterProvider } from 'react-router-dom'
 import { router } from './helper/router'
+import { ReactFlowProvider } from 'reactflow'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>,
+  <>
+    <ReactFlowProvider>
+      <RouterProvider router={router} />
+    </ReactFlowProvider>
+  </>,
 )
