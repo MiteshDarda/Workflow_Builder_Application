@@ -16,5 +16,6 @@ import { WorkflowModule } from './api/workflow/workflow.module';
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [TypeOrmModule.forFeature(allEntities)],
 })
 export class AppModule {}

@@ -1,13 +1,22 @@
-import { Controller, Get, Post, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Param,
+  Delete,
+  Body,
+} from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
+import { CreateWorkflowDto } from './dto/create-workflow.dto';
 
 @Controller('workflow')
 export class WorkflowController {
   constructor(private readonly workflowService: WorkflowService) {}
 
   @Post()
-  create() {
-    return this.workflowService.create();
+  create(@Body() body: CreateWorkflowDto) {
+    return this.workflowService.create(body);
   }
 
   @Get()
