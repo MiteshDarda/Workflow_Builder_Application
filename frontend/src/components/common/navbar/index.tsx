@@ -7,6 +7,7 @@ import {
   List,
   ListItem,
   Toolbar,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -24,15 +25,17 @@ const LeftNavbar = ({
 }) => {
   const navigate = useNavigate()
   return (
-    <Drawer anchor="left" variant={'persistent'} open={open} onClose={onClose}>
+    <Drawer anchor="left" variant={'temporary'} open={open} onClose={onClose}>
       <List disablePadding>
         <ListItem disablePadding>
-          <button
-            className="hover:bg-gray-200 hover:shadow-lg w-32 h-full px-8 py-5"
-            onClick={onClose}
-          >
-            <ArrowBackIosNewIcon />
-          </button>
+          <Tooltip title="Close">
+            <button
+              className="hover:bg-gray-200 hover:shadow-lg w-32 h-full px-8 py-5"
+              onClick={onClose}
+            >
+              <ArrowBackIosNewIcon />
+            </button>
+          </Tooltip>
         </ListItem>
         <ListItem disablePadding>
           <button

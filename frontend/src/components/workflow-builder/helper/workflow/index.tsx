@@ -11,6 +11,7 @@ import {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import SaveIcon from '@mui/icons-material/Save'
+import { Tooltip } from '@mui/material'
 
 // let id = 0
 const getId = () => `dndnode_${Date.now()}`
@@ -68,9 +69,11 @@ export default function Workflow() {
   return (
     <div className=" w-[90%] h-[80%] border-4 mt-10 relative">
       <div className="flex items-center gap-2 absolute bottom-0 left-4 z-[999] translate-y-[100%]">
-        <button className="bg-green-200 p-1 rounded-full cursor-pointer">
-          <SaveIcon className="text-green-600" />
-        </button>
+        <Tooltip title={'Save'}>
+          <button className="bg-green-600 hover:bg-green-500 p-1 rounded-full cursor-pointer">
+            <SaveIcon className="text-green-300 hover:text-black" />
+          </button>
+        </Tooltip>
         <div className="text-red-600">Not Saved...</div>
       </div>
       <ReactFlow

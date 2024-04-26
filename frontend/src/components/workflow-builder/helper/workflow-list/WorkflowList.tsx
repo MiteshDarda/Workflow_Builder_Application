@@ -1,3 +1,4 @@
+import { Tooltip } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNodes } from 'reactflow'
 
@@ -24,15 +25,6 @@ export default function WorkflowList() {
       event.preventDefault()
       return
     }
-    // if (nodeData.name === 'Start') setTotalStartNodes((prev) => prev + 1)
-    // console.log(nodeData)
-    // if (
-    //   (nodeData.name === 'Start' || nodeData.name === 'End') &&
-    //   nodes.find((node) => node.data?.label === nodeData.name)
-    // ) {
-    //   event.preventDefault() // Prevent dragging if the node is "Start" or "End" and already exists
-    //   return
-    // }
     event.dataTransfer.setData(
       'application/reactflow',
       JSON.stringify(nodeData),
@@ -53,25 +45,37 @@ export default function WorkflowList() {
       <div className="bg-gray-700 text-white text-center py-5 shadow-md">
         {'Workflow-Nodes'}
       </div>
-      {workFlowNodesList.map((nodeData, ind) => {
-        return (
-          <div
-            // className="dndnode text-wrap h-full bg-gray-200 hover:bg-gray-300 m-2 my-4 text-center py-5 shadow-md hover:shadow-xl rounded-lg"
-            className={`dndnode text-wrap h-full bg-gray-200 m-2 my-4 text-center py-5 shadow-md rounded-lg 
+      <>
+        {workFlowNodesList.map((nodeData, ind) => {
+          return (
+            <Tooltip
+              title={
+                (nodeData.name === 'Start' && totalStartNodes) ||
+                (nodeData.name === 'End' && totalEndNodes)
+                  ? 'Only 1 Allowded'
+                  : 'Drag to Canvas'
+              }
+              key={ind}
+              draggable="true"
+            >
+              <div
+                className={`dndnode text-wrap h-full bg-gray-200 m-2 my-4 text-center py-5 shadow-md rounded-lg 
             ${
               (nodeData.name === 'Start' && totalStartNodes) ||
               (nodeData.name === 'End' && totalEndNodes)
                 ? ' bg-red-400 cursor-not-allowed'
                 : ' hover:shadow-xl hover:bg-gray-300 cursor-grab'
             }`}
-            key={ind}
-            draggable="true"
-            onDragStart={(event) => onDragStart(event, nodeData)}
-          >
-            {nodeData.name}
-          </div>
-        )
-      })}
+                key={ind}
+                draggable="true"
+                onDragStart={(event) => onDragStart(event, nodeData)}
+              >
+                {nodeData.name}
+              </div>
+            </Tooltip>
+          )
+        })}
+      </>
     </div>
   )
 }
