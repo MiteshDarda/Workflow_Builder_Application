@@ -13,6 +13,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNavTitle } from '../../../store/reducers/nav-title-slice'
+import { ROUTES, ROUTE_TITLE } from '../../../helper/constants'
 
 const LeftNavbar = ({
   open,
@@ -37,7 +38,7 @@ const LeftNavbar = ({
           <button
             className="hover:bg-gray-200 hover:shadow-lg w-32 h-full px-8 py-5"
             onClick={() => {
-              navigate('./')
+              navigate('.' + ROUTES.BUILDER)
               onClose()
             }}
           >
@@ -48,7 +49,7 @@ const LeftNavbar = ({
           <button
             className="hover:bg-gray-200 hover:shadow-lg w-32 h-full px-8 py-5"
             onClick={() => {
-              navigate('./run-workflow')
+              navigate('.' + ROUTES.RUN_WORKFLOW)
               onClose()
             }}
           >
@@ -67,10 +68,10 @@ const Navbar = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (location.pathname === '/') {
-      dispatch(setNavTitle('Workflow-Builder'))
-    } else if (location.pathname === '/run-workflow') {
-      dispatch(setNavTitle('Run-Workflow'))
+    if (location.pathname === ROUTES.BUILDER) {
+      dispatch(setNavTitle(ROUTE_TITLE.BUILDER))
+    } else if (location.pathname === ROUTES.RUN_WORKFLOW) {
+      dispatch(setNavTitle(ROUTE_TITLE.RUN_WORKFLOW))
     }
   }, [location, dispatch])
 

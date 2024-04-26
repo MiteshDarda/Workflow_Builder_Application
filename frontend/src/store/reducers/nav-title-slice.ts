@@ -1,5 +1,6 @@
 // src/store/navTitleSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { ROUTE_TITLE } from '../../helper/constants'
 
 interface NavTitleState {
   title: string
@@ -10,7 +11,7 @@ const initialState: NavTitleState = {
 }
 
 const navTitleSlice = createSlice({
-  name: 'navTitle',
+  name: ROUTE_TITLE.BUILDER,
   initialState,
   reducers: {
     setNavTitle(state, action: PayloadAction<string>) {
