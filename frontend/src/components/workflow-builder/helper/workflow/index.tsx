@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react'
 import {
   Background,
+  BackgroundVariant,
   Connection,
   Controls,
-  MiniMap,
   ReactFlow,
   addEdge,
   useEdgesState,
@@ -13,7 +13,6 @@ import 'reactflow/dist/style.css'
 import SaveIcon from '@mui/icons-material/Save'
 import { Tooltip } from '@mui/material'
 
-// let id = 0
 const getId = () => `dndnode_${Date.now()}`
 
 export default function Workflow() {
@@ -68,10 +67,11 @@ export default function Workflow() {
 
   return (
     <div className=" w-[90%] h-[80%] border-4 mt-10 relative">
-      <div className="flex items-center gap-2 absolute bottom-0 left-4 z-[999] translate-y-[100%]">
+      <div className="flex items-center gap-2 absolute bottom-0 right-4 z-[999] translate-y-[120%]">
         <Tooltip title={'Save'}>
-          <button className="bg-green-600 hover:bg-green-500 p-1 rounded-full cursor-pointer">
-            <SaveIcon className="text-green-300 hover:text-black" />
+          <button className="bg-green-600 text-green-300 hover:bg-green-500 p-1 sm:px-3 sm:py-2 rounded-full cursor-pointer">
+            <SaveIcon className=" hover:text-black" />
+            Save
           </button>
         </Tooltip>
         <div className="text-red-600">Not Saved...</div>
@@ -87,8 +87,7 @@ export default function Workflow() {
         onDragOver={onDragOver}
         fitView
       >
-        <Background />
-        <MiniMap />
+        <Background variant={BackgroundVariant.Lines} />
         <Controls />
       </ReactFlow>
     </div>

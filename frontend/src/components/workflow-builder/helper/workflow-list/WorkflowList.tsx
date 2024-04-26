@@ -42,7 +42,7 @@ export default function WorkflowList() {
   ]
   return (
     <div className="bg-gray-700">
-      <div className="bg-gray-700 text-white text-center py-5 shadow-md">
+      <div className="bg-gray-700 text-white text-center sm:py-5 shadow-md">
         {'Workflow-Nodes'}
       </div>
       <>
@@ -59,7 +59,7 @@ export default function WorkflowList() {
               draggable="true"
             >
               <div
-                className={`dndnode text-wrap h-full bg-gray-200 m-2 my-4 text-center py-5 shadow-md rounded-lg 
+                className={`dndnode text-wrap h-full bg-gray-200 sm:m-2 m-1 sm:my-4 my-2 text-center sm:py-5 shadow-md rounded-lg 
             ${
               (nodeData.name === 'Start' && totalStartNodes) ||
               (nodeData.name === 'End' && totalEndNodes)

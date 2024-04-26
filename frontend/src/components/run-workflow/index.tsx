@@ -1,3 +1,9 @@
+import Dropzone from './Helper/Dropzone'
+
 export default function RunWorkflow() {
-  return <>run</>
+  return (
+    <>
+      <Dropzone />
+    </>
+  )
 }
