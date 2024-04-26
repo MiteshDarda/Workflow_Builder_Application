@@ -19,7 +19,7 @@ export async function createWorkflow(nodes: any, edges: any) {
     }
 
     const response = await axios.request(config)
-    console.log(JSON.stringify(response.data))
+    return response.data
   } catch (error) {
     console.log(error)
     throw error

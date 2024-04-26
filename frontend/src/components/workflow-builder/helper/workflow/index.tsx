@@ -20,6 +20,7 @@ export default function Workflow() {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
+  const [workflowId, setWorkflowId] = useState<number | null>(null)
 
   //* On Connect .
   const onConnect = useCallback(
@@ -69,16 +70,30 @@ export default function Workflow() {
     [reactFlowInstance, setNodes],
   )
 
+  //* Workflow Action .
+  async function workflowAction() {
+    if (workflowId) {
+      console.log('patching')
+      // Patch
+    } else {
+      await saveWorkflow()
+    }
+  }
+
   //* Save Workflow .
   async function saveWorkflow() {
-    try {
-      const id = await createWorkflow(nodes, edges)
-      console.log(id)
-    } catch (error) {
-      console.log(error)
+    if (!nodes.length) {
+      //! Show Some Error
+      console.log('nope not today')
+      return
     }
-    console.log(nodes)
-    console.log(edges)
+    try {
+      const res = await createWorkflow(nodes, edges)
+      if (res.id) setWorkflowId(res.id)
+      console.log(res)
+    } catch (error) {
+      //! Show Some Error
+    }
   }
 
   return (
@@ -87,13 +102,19 @@ export default function Workflow() {
         <Tooltip title={'Save'}>
           <button
             className="bg-green-600 text-green-300 hover:bg-green-500 p-1 sm:px-3 sm:py-2 rounded-full cursor-pointer"
-            onClick={saveWorkflow}
+            onClick={workflowAction}
           >
             <SaveIcon className=" hover:text-black" />
             Save
           </button>
         </Tooltip>
-        <div className="text-red-600">Not Saved...</div>
+        {workflowId ? (
+          <div className="p-1 sm:px-3 sm:py-2 bg-gray-200 rounded-lg">
+            Workflow ID : {workflowId}
+          </div>
+        ) : (
+          <div className="text-red-600">Not Saved...</div>
+        )}
       </div>
       <ReactFlow
         nodes={nodes}
