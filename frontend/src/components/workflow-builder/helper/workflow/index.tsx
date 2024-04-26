@@ -12,7 +12,8 @@ import {
 import 'reactflow/dist/style.css'
 import SaveIcon from '@mui/icons-material/Save'
 import { Tooltip } from '@mui/material'
-import { createWorkflow } from '../../../../api/workflow/create'
+import { createWorkflowAPI } from '../../../../api/workflow/create'
+import { updateWorkflowAPI } from '../../../../api/workflow/update'
 
 const getId = () => `dndnode_${Date.now()}`
 
@@ -73,8 +74,7 @@ export default function Workflow() {
   //* Workflow Action .
   async function workflowAction() {
     if (workflowId) {
-      console.log('patching')
-      // Patch
+      updateWorkflow()
     } else {
       await saveWorkflow()
     }
@@ -88,9 +88,24 @@ export default function Workflow() {
       return
     }
     try {
-      const res = await createWorkflow(nodes, edges)
+      const res = await createWorkflowAPI(nodes, edges)
       if (res.id) setWorkflowId(res.id)
       console.log(res)
+    } catch (error) {
+      //! Show Some Error
+    }
+  }
+
+  async function updateWorkflow() {
+    if (!nodes.length) {
+      //! Show Some Error
+      console.log('nope not today')
+      return
+    }
+    try {
+      const res = await updateWorkflowAPI(nodes, edges, workflowId as number)
+      console.log(res)
+      //! Show Updaetd Succesfully
     } catch (error) {
       //! Show Some Error
     }

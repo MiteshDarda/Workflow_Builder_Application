@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
 import { WorkflowEntity } from './workflow.entity';
 
-@Entity()
+@Entity('node')
 export class NodeEntity {
   @PrimaryColumn({ type: 'varchar', length: 250 })
   id: string;
@@ -24,6 +24,8 @@ export class NodeEntity {
   @Column({ type: 'varchar', length: 250, nullable: true })
   positionY: string;
 
-  @ManyToOne(() => WorkflowEntity, (workflow) => workflow.nodes)
+  @ManyToOne(() => WorkflowEntity, (workflow) => workflow.nodes, {
+    nullable: true,
+  })
   workflow: WorkflowEntity;
 }

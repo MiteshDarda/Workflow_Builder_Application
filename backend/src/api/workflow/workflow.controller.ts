@@ -30,8 +30,8 @@ export class WorkflowController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.workflowService.update(+id);
+  update(@Param('id') id: string, @Body() body: CreateWorkflowDto) {
+    return this.workflowService.update(+id, body);
   }
 
   @Delete(':id')

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WorkflowEntity } from './entities/workflow.entity';
@@ -85,8 +85,43 @@ export class WorkflowService {
     return `This action returns a #${id} workflow`;
   }
 
-  update(id: number) {
-    return `This action updates a #${id} workflow`;
+  //* Update Workflow .
+  async update(id: number, body: CreateWorkflowDto) {
+    const nodeEntitys = this.createNodes(body);
+    const edgeEntitys = this.createEdges(body);
+    const workflow = await this.workflowEntity
+      .createQueryBuilder('workflow')
+      .where('workflow.id = :id', { id })
+      .getOne();
+    if (!workflow)
+      throw new HttpException(
+        { message: 'workflow doesnt exists' },
+        HttpStatus.BAD_REQUEST,
+      );
+
+    workflow.edges = edgeEntitys;
+    workflow.nodes = nodeEntitys;
+
+    const workflowId = workflow.id;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      queryRunner.startTransaction();
+      queryRunner.manager.delete(NodeEntity, { workflow: workflowId });
+      queryRunner.manager.delete(EdgeEntity, { workflow: workflowId });
+      await queryRunner.manager.save(nodeEntitys);
+      await queryRunner.manager.save(edgeEntitys);
+      await queryRunner.manager.save(workflow);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+
+    return { message: 'Updated Succesfully' };
   }
 
   remove(id: number) {

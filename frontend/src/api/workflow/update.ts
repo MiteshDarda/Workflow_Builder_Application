@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export async function createWorkflowAPI(nodes: any, edges: any) {
+export async function updateWorkflowAPI(nodes: any, edges: any, id: number) {
   const api = import.meta.env.VITE_API
   try {
     const data = JSON.stringify({
@@ -9,9 +9,9 @@ export async function createWorkflowAPI(nodes: any, edges: any) {
     })
 
     const config = {
-      method: 'post',
+      method: 'patch',
       maxBodyLength: Infinity,
-      url: `${api}/workflow`,
+      url: `${api}/workflow/${id}`,
       headers: {
         'Content-Type': 'application/json',
       },
