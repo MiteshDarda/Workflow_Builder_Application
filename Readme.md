@@ -1,51 +1,68 @@
-## TechStack
+# Workflow Management Application
 
-- **Frontend**: ReactJS + Typescript + Tailwind-css + ReactFlow + Redux + MUI
-- **Backend**: NestJs + PostgreSql + Typeorm + Typescript + class-transformer + class-validator
+## Tech Stack
 
-### Features
+- **Frontend**: ReactJS + TypeScript + Tailwind CSS + ReactFlow + Redux + Material-UI
+- **Backend**: NestJS + PostgreSQL + TypeORM + TypeScript + class-transformer + class-validator
 
-- **React-Flow**: Allows creation of workflows with drag and drop nodes:
-  - 'Start node'
-  - 'Filter Data node': Converts Csv columns to lowercase
-  - 'Wait node': Waits for 5 Seconds
-  - 'Convert Format node': Converts CSV file to JSON 
-  - 'Send POST Request node'
-  - 'End node'
+## Features
+
+- **React-Flow**: Create workflows with drag-and-drop nodes:
+  - 'Start' node
+  - 'Filter Data' node: Converts CSV columns to lowercase
+  - 'Wait' node: Waits for 5 seconds
+  - 'Convert Format' node: Converts CSV file to JSON
+  - 'Send POST Request' node
+  - 'End' node
 - Select and run workflows on the run-workflow page.
 - **react-router-dom** for routing.
-- **redux** for state management like error state, success state, and nav-state.
-- Progress bar with **Server-Side-Events (SSE)/EventSource**.
+- **redux** for state management including error, success, and navigation states.
+- Progress bar with **Server-Side Events (SSE)/EventSource**.
 
-## Work Flow Home
-![work-flow-home](./img/home/page.png)
+## Screenshots
 
-## Save to get work-flow-id
-![work-flow-home](./img/home/save.png)
+1. **Work Flow Home**
+   ![Work Flow Home](./img/home/page.png)
+   Description: Overview of the workflow home page.
 
-## Nav-bar
-![work-flow-home](./img/nav-bar.png)
+2. **Save Workflow to Get Workflow ID**
+   ![Save Workflow](./img/home/save.png)
+   Description: Saving a workflow to obtain a workflow ID.
 
-## Run-workflow with different routing
-![work-flow-home](./img/run-workflow/home.png)
+3. **Nav-bar**
+   ![Nav-bar](./img/nav-bar.png)
+   Description: Navigation bar for easy access to different sections of the application.
 
-## Working Progress-Bar
-![work-flow-home](./img/run-workflow/working.png)
+4. **Run Workflow with Different Routing**
+   ![Run Workflow](./img/run-workflow/home.png)
+   Description: Running a workflow with different routing options.
 
-## Post Request Working
-![work-flow-home](./img/post-req.png)
+5. **Working Progress-Bar**
+   ![Progress Bar](./img/run-workflow/working.png)
+   Description: Progress bar indicating the status of the workflow execution.
 
-### To Run
+6. **POST Request Working**
+   ![POST Request](./img/post-req.png)
+   Description: Illustration of a POST request being processed within the workflow.
 
-1. Change **./frontend/env.env** to **./frontend/.env**.
-2. Change **./backend/env.env** to **./backend/.env**.
-3. Run the following commands in the terminal:
-   1. `cd frontend`
-   2. `npm i`
-   3. `cd ..`
-   4. `cd backend`
-   5. `npm i`
-4. Setup Postgres according to `./backend/.env`.
-5. Open 2 separate terminals:
-   1. In the first one, `cd frontend` and run `npm run start`.
-   2. In the second one, `cd backend` and run `npm run start:dev`.
+## Getting Started
+
+### Prerequisites
+
+- Node.js and npm installed.
+- PostgreSQL database set up.
+
+### Installation
+
+1. Rename `./frontend/env.env` to `./frontend/.env` and `./backend/env.env` to `./backend/.env`.
+2. Navigate to the `frontend` directory in your terminal and run `npm install`.
+3. Navigate back to the root directory and then to the `backend` directory in your terminal and run `npm install`.
+4. Set up PostgreSQL according to the configurations specified in `./backend/.env`.
+
+### Running Locally
+
+1. Open two separate terminals:
+   - Terminal 1: Navigate to the `frontend` directory and run `npm run start`.
+   - Terminal 2: Navigate to the `backend` directory and run `npm run start:dev`.
+
+Your application should now be up and running locally.
