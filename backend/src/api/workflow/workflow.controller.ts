@@ -7,12 +7,21 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  Sse,
 } from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RunWorkflowDto } from './dto/run-workflow.dto';
+import { Observable } from 'rxjs';
+import { sseDto } from './dto/sse.dto';
 
+export interface MessageEvent {
+  data: string | object;
+  id?: string;
+  type?: string;
+  retry?: number;
+}
 @Controller('workflow')
 export class WorkflowController {
   constructor(private readonly workflowService: WorkflowService) {}
@@ -40,5 +49,12 @@ export class WorkflowController {
   @UseInterceptors(FileInterceptor('file'))
   run(@Body() body: RunWorkflowDto, @UploadedFile() file: File) {
     return this.workflowService.run(body.workflowId, file);
+  }
+
+  //* SSE .
+  @Sse('sse/:eventId')
+  sse(@Param() param: sseDto): Observable<MessageEvent> {
+    console.log(param);
+    return this.workflowService.sse(param.eventId);
   }
 }
