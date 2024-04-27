@@ -16,6 +16,7 @@ export default function RunWorkflow() {
       />
       <SelectWorkflowForm
         disabled={!acceptedFiles.length}
+        acceptedFiles={acceptedFiles}
         loading={loading}
         setLoading={setLoading}
         workflow={workflow}

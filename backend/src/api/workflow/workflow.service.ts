@@ -105,6 +105,11 @@ export class WorkflowService {
     return { message: 'Updated Succesfully' };
   }
 
+  //* Run Workflow .
+  async run(id: number, file: File) {
+    console.log(id, file);
+  }
+
   //$ find the workflow by id .
   async findOne(id: number) {
     return await this.workflowEntity

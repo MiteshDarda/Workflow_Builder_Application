@@ -9,6 +9,7 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { getAllWorkflowAPI } from '../../../api/workflow/get-all'
+import { runWorkflowAPI } from '../../../api/workflow/run'
 
 type PropType = {
   disabled: boolean
@@ -16,12 +17,14 @@ type PropType = {
   setLoading: any
   workflow: any
   setWorkflow: any
+  acceptedFiles: File[]
 }
 
 export default function SelectWorkflowForm({
   disabled,
   loading,
   setLoading,
+  acceptedFiles,
   workflow,
   setWorkflow,
 }: PropType) {
@@ -41,6 +44,11 @@ export default function SelectWorkflowForm({
 
   const handleChange = (event: SelectChangeEvent) => {
     setWorkflow(event.target.value)
+  }
+
+  async function runWorkflowHandler() {
+    const res = await runWorkflowAPI(workflow, acceptedFiles[0])
+    console.log(res)
   }
   return (
     <div className=" flex justify-center items-center gap-5">
@@ -74,6 +82,7 @@ export default function SelectWorkflowForm({
         disabled={disabled || !workflow || loading}
         variant="contained"
         sx={{ height: '80%' }}
+        onClick={runWorkflowHandler}
       >
         {' '}
         {loading ? <CircularProgress /> : <>Run</>}
