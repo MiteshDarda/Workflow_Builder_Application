@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  Delete,
-  Body,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
 
@@ -14,28 +6,21 @@ import { CreateWorkflowDto } from './dto/create-workflow.dto';
 export class WorkflowController {
   constructor(private readonly workflowService: WorkflowService) {}
 
+  //* Create new Workflow .
   @Post()
   create(@Body() body: CreateWorkflowDto) {
     return this.workflowService.create(body);
   }
 
+  //* Find all Workflows .
   @Get()
   findAll() {
     return this.workflowService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.workflowService.findOne(+id);
-  }
-
+  //* Update Workflow .
   @Patch(':id')
   update(@Param('id') id: string, @Body() body: CreateWorkflowDto) {
     return this.workflowService.update(+id, body);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.workflowService.remove(+id);
   }
 }

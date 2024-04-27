@@ -51,48 +51,29 @@ export class WorkflowService {
     };
   }
 
-  // $ Create node Entitys .
-  createNodes(body: CreateWorkflowDto) {
-    return body.nodes.map((node) => {
-      const newNodeEntity = new NodeEntity();
-      newNodeEntity.height = node.height;
-      newNodeEntity.id = node.id;
-      newNodeEntity.positionX = node?.position?.x;
-      newNodeEntity.positionY = node?.position?.y;
-      newNodeEntity.title = node?.data?.label;
-      newNodeEntity.width = node.width;
-      newNodeEntity.type = node.type;
-      return newNodeEntity;
-    });
-  }
+  //* Find all Workflows .
+  async findAll() {
+    const workflows = await this.workflowEntity
+      .createQueryBuilder()
+      .getManyAndCount();
 
-  // $ Create edge Entitys .
-  createEdges(body: CreateWorkflowDto) {
-    return body.edges.map((edge) => {
-      const newEdgeEnity = new EdgeEntity();
-      newEdgeEnity.id = edge.id;
-      newEdgeEnity.source = edge.source;
-      newEdgeEnity.target = edge.target;
-      return newEdgeEnity;
-    });
-  }
+    if (!workflows)
+      throw new HttpException(
+        { message: 'workflow doesnt exists' },
+        HttpStatus.BAD_REQUEST,
+      );
 
-  findAll() {
-    return `This action returns all workflow`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} workflow`;
+    return {
+      workflowIds: workflows[0],
+      total: workflows[1],
+    };
   }
 
   //* Update Workflow .
   async update(id: number, body: CreateWorkflowDto) {
     const nodeEntitys = this.createNodes(body);
     const edgeEntitys = this.createEdges(body);
-    const workflow = await this.workflowEntity
-      .createQueryBuilder('workflow')
-      .where('workflow.id = :id', { id })
-      .getOne();
+    const workflow = await this.findOne(id);
     if (!workflow)
       throw new HttpException(
         { message: 'workflow doesnt exists' },
@@ -124,7 +105,37 @@ export class WorkflowService {
     return { message: 'Updated Succesfully' };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} workflow`;
+  //$ find the workflow by id .
+  async findOne(id: number) {
+    return await this.workflowEntity
+      .createQueryBuilder('workflow')
+      .where('workflow.id = :id', { id })
+      .getOne();
+  }
+
+  // $ Create node Entitys .
+  createNodes(body: CreateWorkflowDto) {
+    return body.nodes.map((node) => {
+      const newNodeEntity = new NodeEntity();
+      newNodeEntity.height = node.height;
+      newNodeEntity.id = node.id;
+      newNodeEntity.positionX = node?.position?.x;
+      newNodeEntity.positionY = node?.position?.y;
+      newNodeEntity.title = node?.data?.label;
+      newNodeEntity.width = node.width;
+      newNodeEntity.type = node.type;
+      return newNodeEntity;
+    });
+  }
+
+  // $ Create edge Entitys .
+  createEdges(body: CreateWorkflowDto) {
+    return body.edges.map((edge) => {
+      const newEdgeEnity = new EdgeEntity();
+      newEdgeEnity.id = edge.id;
+      newEdgeEnity.source = edge.source;
+      newEdgeEnity.target = edge.target;
+      return newEdgeEnity;
+    });
   }
 }

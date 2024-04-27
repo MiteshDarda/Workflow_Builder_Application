@@ -120,7 +120,7 @@ export default function Workflow() {
             onClick={workflowAction}
           >
             <SaveIcon className=" hover:text-black" />
-            Save
+            {workflowId ? <>Update</> : <>Save</>}
           </button>
         </Tooltip>
         {workflowId ? (
