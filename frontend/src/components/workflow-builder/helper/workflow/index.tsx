@@ -14,6 +14,9 @@ import SaveIcon from '@mui/icons-material/Save'
 import { Tooltip } from '@mui/material'
 import { createWorkflowAPI } from '../../../../api/workflow/create'
 import { updateWorkflowAPI } from '../../../../api/workflow/update'
+import { useDispatch } from 'react-redux'
+import { setMessage } from '../../../../store/reducers/message-slice'
+import { MessageTypeEnum } from '../../../../store/reducers/enums/message-type-enum'
 
 const getId = () => `dndnode_${Date.now()}`
 
@@ -22,6 +25,7 @@ export default function Workflow() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
   const [workflowId, setWorkflowId] = useState<number | null>(null)
+  const dispatch = useDispatch()
 
   //* On Connect .
   const onConnect = useCallback(
@@ -35,6 +39,12 @@ export default function Workflow() {
         setEdges((prevEdges) => addEdge({ ...connection }, prevEdges))
       } else {
         //! Generate Error on this
+        dispatch(
+          setMessage({
+            type: MessageTypeEnum.ERROR,
+            text: `Error`,
+          }),
+        )
       }
     },
     [edges, setEdges],
@@ -83,31 +93,54 @@ export default function Workflow() {
   //* Save Workflow .
   async function saveWorkflow() {
     if (!nodes.length) {
-      //! Show Some Error
       console.log('nope not today')
       return
     }
     try {
       const res = await createWorkflowAPI(nodes, edges)
       if (res.id) setWorkflowId(res.id)
-      console.log(res)
-    } catch (error) {
-      //! Show Some Error
+      dispatch(
+        setMessage({
+          type: MessageTypeEnum.SUCCESS,
+          text: `Successfully Saved`,
+        }),
+      )
+    } catch (error: any) {
+      dispatch(
+        setMessage({
+          type: MessageTypeEnum.ERROR,
+          text: `Server Error`,
+        }),
+      )
     }
   }
 
   async function updateWorkflow() {
     if (!nodes.length) {
-      //! Show Some Error
-      console.log('nope not today')
+      dispatch(
+        setMessage({
+          type: MessageTypeEnum.ERROR,
+          text: `Add Atleast 1 node`,
+        }),
+      )
       return
     }
     try {
       const res = await updateWorkflowAPI(nodes, edges, workflowId as number)
       console.log(res)
-      //! Show Updaetd Succesfully
-    } catch (error) {
-      //! Show Some Error
+      dispatch(
+        setMessage({
+          type: MessageTypeEnum.SUCCESS,
+          text: `Updated Successfully`,
+        }),
+      )
+    } catch (error: any) {
+      dispatch(
+        setMessage({
+          type: MessageTypeEnum.ERROR,
+          text: `Server Error`,
+        }),
+      )
     }
   }
 

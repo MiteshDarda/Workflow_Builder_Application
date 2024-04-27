@@ -10,6 +10,9 @@ import {
 import { useEffect, useState } from 'react'
 import { getAllWorkflowAPI } from '../../../api/workflow/get-all'
 import { runWorkflowAPI } from '../../../api/workflow/run'
+import { useDispatch } from 'react-redux'
+import { setMessage } from '../../../store/reducers/message-slice'
+import { MessageTypeEnum } from '../../../store/reducers/enums/message-type-enum'
 
 type PropType = {
   disabled: boolean
@@ -18,6 +21,8 @@ type PropType = {
   workflow: any
   setWorkflow: any
   acceptedFiles: File[]
+  setEventId: any
+  setProgress: any
 }
 
 export default function SelectWorkflowForm({
@@ -27,16 +32,24 @@ export default function SelectWorkflowForm({
   acceptedFiles,
   workflow,
   setWorkflow,
+  setEventId,
+  setProgress,
 }: PropType) {
   const [workflowList, setWorkflowList] = useState<any[]>([])
+  const dispatch = useDispatch()
 
   useEffect(() => {
     async function apiCall() {
       try {
         const all = await getAllWorkflowAPI()
         if (all) setWorkflowList(all.workflowIds)
-      } catch (error) {
-        //! show error
+      } catch (error: any) {
+        dispatch(
+          setMessage({
+            type: MessageTypeEnum.ERROR,
+            text: `${error.response.status} ${error.response?.statusText}`,
+          }),
+        )
       }
     }
     apiCall()
@@ -47,15 +60,27 @@ export default function SelectWorkflowForm({
   }
 
   async function runWorkflowHandler() {
-    const res = await runWorkflowAPI(workflow, acceptedFiles[0])
-    console.log(res)
+    setLoading(true)
+    setProgress(0)
+    try {
+      const res = await runWorkflowAPI(workflow, acceptedFiles[0])
+      setEventId(res.eventId)
+    } catch (error) {
+      setLoading(false)
+      dispatch(
+        setMessage({
+          type: MessageTypeEnum.ERROR,
+          text: `Error: Make sure workflow is properly connected from start to end`,
+        }),
+      )
+    }
   }
   return (
-    <div className=" flex justify-center items-center gap-5">
-      <div>Select Wrokflow : </div>
+    <div className=" flex justify-center items-center gap-5 h-[2rem] sm:h-[4rem]">
+      <div className="text-xs sm:text-base">Select Wrokflow : </div>
       <FormControl
         variant="filled"
-        sx={{ m: 1, minWidth: 150 }}
+        sx={{ m: 1, minWidth: 150, height: '100%' }}
         className="flex flex-col"
         disabled={disabled || loading}
       >
