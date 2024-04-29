@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-// Define a type for message types
 type MessageType = 'error' | 'warning' | 'success'
 
 interface MessageState {

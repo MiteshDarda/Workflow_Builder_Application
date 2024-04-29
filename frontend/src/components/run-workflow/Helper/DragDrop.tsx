@@ -4,6 +4,7 @@ import AttachmentIcon from '@mui/icons-material/Attachment'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { Button } from '@mui/material'
 
+//$ Type .
 type PropType = {
   acceptedFiles: File[]
   setAcceptedFiles: Dispatch<SetStateAction<File[]>>
@@ -11,10 +12,12 @@ type PropType = {
 }
 
 const DragDrop = ({ acceptedFiles, setAcceptedFiles, disabled }: PropType) => {
+  //$ Constants .
   const acceptedFileTypes: { [key: string]: string[] } = {
     'text/csv': ['.csv'],
   }
 
+  //$ Functions .
   const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
     accept: acceptedFileTypes,
@@ -31,6 +34,7 @@ const DragDrop = ({ acceptedFiles, setAcceptedFiles, disabled }: PropType) => {
     setAcceptedFiles([])
   }
 
+  //$ JSX .
   return (
     <div className="grow max-h-[50%] max-w-[50%]">
       <div

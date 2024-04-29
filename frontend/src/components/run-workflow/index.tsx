@@ -4,6 +4,7 @@ import SelectWorkflowForm from './Helper/SelectWorkflowForm'
 import { LinearProgress } from '@mui/material'
 
 export default function RunWorkflow() {
+  //$ Constants .
   const api = import.meta.env.VITE_API
   const [acceptedFiles, setAcceptedFiles] = useState<File[]>([])
   const [loading, setLoading] = useState<boolean>(false)
@@ -12,6 +13,7 @@ export default function RunWorkflow() {
   const [progress, setProgress] = useState(0)
   const [completedWork, setCompletedWork] = useState([])
 
+  //$ Use Effect .
   useEffect(() => {
     if (!eventId) return
     setLoading(true)
@@ -47,6 +49,7 @@ export default function RunWorkflow() {
     }
   }, [eventId])
 
+  //$ JSX .
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-around sm:pt-10 ">
       <DragDrop

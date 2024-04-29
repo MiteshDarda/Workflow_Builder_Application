@@ -21,13 +21,14 @@ import { MessageTypeEnum } from '../../../../store/reducers/enums/message-type-e
 const getId = () => `dndnode_${Date.now()}`
 
 export default function Workflow() {
+  //$ Constants .
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
   const [workflowId, setWorkflowId] = useState<number | null>(null)
   const dispatch = useDispatch()
 
-  //* On Connect .
+  //$ Use CallBacks .
   const onConnect = useCallback(
     (connection: Connection) => {
       const existingEdge = edges.find(
@@ -50,13 +51,11 @@ export default function Workflow() {
     [edges, setEdges],
   )
 
-  //* On Drag Over .
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'move'
   }, [])
 
-  //* On Drop .
   const onDrop = useCallback(
     (event: any) => {
       event.preventDefault()
@@ -81,7 +80,7 @@ export default function Workflow() {
     [reactFlowInstance, setNodes],
   )
 
-  //* Workflow Action .
+  //$ Functions .
   async function workflowAction() {
     if (workflowId) {
       updateWorkflow()
@@ -90,7 +89,6 @@ export default function Workflow() {
     }
   }
 
-  //* Save Workflow .
   async function saveWorkflow() {
     if (!nodes.length) {
       console.log('nope not today')
@@ -144,6 +142,7 @@ export default function Workflow() {
     }
   }
 
+  //$ JSX .
   return (
     <div className=" w-[90%] h-[80%] border-4 mt-10 relative">
       <div className="flex items-center gap-2 absolute bottom-0 right-4 z-[999] translate-y-[120%]">

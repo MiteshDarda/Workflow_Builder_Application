@@ -5,7 +5,7 @@ import { clearMessage } from '../../../store/reducers/message-slice'
 import { RootState } from '../../../store/reducers'
 
 export default function Background() {
-  //* Message .
+  //$ Constants .
   const [messageProgress, setMessageProgress] = useState(0)
   const messageType = useSelector(
     (state: RootState) => state.message.messageType,
@@ -15,6 +15,13 @@ export default function Background() {
   )
   const dispatch = useDispatch()
 
+  //$ Functions .
+  const handleClose = () => {
+    dispatch(clearMessage())
+  }
+
+  //$ Use Effects .
+  // Timer for message .
   useEffect(() => {
     if (messageType || messageText) {
       const timer = setInterval(() => {
@@ -28,16 +35,13 @@ export default function Background() {
     }
   }, [messageType, messageText])
 
+  // handle close on progress = 100
   useEffect(() => {
     if (messageProgress >= 100) {
       handleClose()
       setMessageProgress(0)
     }
   }, [messageProgress])
-
-  const handleClose = () => {
-    dispatch(clearMessage())
-  }
 
   return (
     <Box position="absolute" top={0} width="100%" zIndex={9999}>

@@ -1,4 +1,3 @@
-// src/store/navTitleSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ROUTE_TITLE } from '../../helper/constants'
 
@@ -7,7 +6,7 @@ interface NavTitleState {
 }
 
 const initialState: NavTitleState = {
-  title: 'Workflow-Builder', // Initial title
+  title: 'Workflow-Builder',
 }
 
 const navTitleSlice = createSlice({

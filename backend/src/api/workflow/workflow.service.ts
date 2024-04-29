@@ -24,7 +24,8 @@ export class WorkflowService {
     private readonly dataSource: DataSource,
   ) {}
 
-  sseEventsAvailable = {
+  //$ Track of sse in progress .
+  sseAvailable = {
     // '1': 99,
   };
 
@@ -135,7 +136,7 @@ export class WorkflowService {
     }
   }
 
-  // $ Convert To Graph .
+  // $ Convert To Graph Run Workflow Helper .
   async toGraph(completeWorkflow: any, file: File) {
     const nodes = {};
     completeWorkflow?.nodes?.filter((node: any) => {
@@ -170,9 +171,9 @@ export class WorkflowService {
     return { eventId: time };
   }
 
-  //$ Run Graph Nodes .
+  //$ Run Graph Nodes Run Workflow Helper .
   async runGraph(graph: any[], nodes: any, time: number, file: File | any) {
-    this.sseEventsAvailable[time] = { completedPercentage: 1, completed: [] };
+    this.sseAvailable[time] = { completedPercentage: 1, completed: [] };
 
     for (const node of graph) {
       const i = graph.indexOf(node);
@@ -180,9 +181,11 @@ export class WorkflowService {
       const latestCompleted = nodes[node];
       let fileJson = null;
 
+      // Start
       if (nodes[node] === workflowNodesConstant.START) {
         // start
       }
+      // Filter
       if (nodes[node] === workflowNodesConstant.FILTER) {
         file = await this.csvParseLowercase(file);
         const opts = {};
@@ -190,11 +193,13 @@ export class WorkflowService {
         file = await parser.parse(file);
         console.log('lowercase', file);
       }
+      // Convert
       if (nodes[node] === workflowNodesConstant.CONVERT) {
         fileJson = await this.csvToJson(file);
         console.log('JSON', fileJson);
         // CSV to JSON
       }
+      // Post
       if (nodes[node] === workflowNodesConstant.POST) {
         if (fileJson) await this.postData(fileJson);
         else {
@@ -203,17 +208,19 @@ export class WorkflowService {
         }
         // POST Req
       }
+      // Wait
       if (nodes[node] === workflowNodesConstant.WAIT) {
         // delay of 5s
         await this.delay(5);
       }
+      // End
       if (nodes[node] === workflowNodesConstant.END) {
         // end
       }
 
-      this.sseEventsAvailable[time]?.completed?.push(nodes[node]);
-      this.sseEventsAvailable[time] = {
-        ...this.sseEventsAvailable[time],
+      this.sseAvailable[time]?.completed?.push(nodes[node]);
+      this.sseAvailable[time] = {
+        ...this.sseAvailable[time],
         completedPercentage,
         latestCompleted,
       };
@@ -221,7 +228,7 @@ export class WorkflowService {
   }
 
   //$ Post Request .
-  async postData(fileJson): Promise<void> {
+  async postData(fileJson: any): Promise<void> {
     try {
       const data = JSON.stringify({
         data: fileJson,
@@ -295,9 +302,9 @@ export class WorkflowService {
   sse(eventId: number): Observable<MessageEvent> {
     return interval(1000).pipe(
       map(() => {
-        if (this.sseEventsAvailable[eventId]) {
+        if (this.sseAvailable[eventId]) {
           return {
-            data: this.sseEventsAvailable[eventId],
+            data: this.sseAvailable[eventId],
             type: '',
           } as MessageEvent;
         } else
@@ -314,7 +321,7 @@ export class WorkflowService {
       .getOne();
   }
 
-  // $ Create node Entitys .
+  // $ Create node Entites .
   createNodes(body: CreateWorkflowDto) {
     return body.nodes.map((node) => {
       const newNodeEntity = new NodeEntity();
@@ -329,7 +336,7 @@ export class WorkflowService {
     });
   }
 
-  // $ Create edge Entitys .
+  // $ Create edge Entites .
   createEdges(body: CreateWorkflowDto) {
     return body.edges.map((edge) => {
       const newEdgeEnity = new EdgeEntity();

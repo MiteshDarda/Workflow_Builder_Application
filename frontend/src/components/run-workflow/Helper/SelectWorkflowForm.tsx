@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux'
 import { setMessage } from '../../../store/reducers/message-slice'
 import { MessageTypeEnum } from '../../../store/reducers/enums/message-type-enum'
 
+//$ Type
 type PropType = {
   disabled: boolean
   loading: any
@@ -35,9 +36,35 @@ export default function SelectWorkflowForm({
   setEventId,
   setProgress,
 }: PropType) {
+  //$ Constants .
   const [workflowList, setWorkflowList] = useState<any[]>([])
   const dispatch = useDispatch()
 
+  //$ Functions .
+  // Form Change Handler
+  const handleChange = (event: SelectChangeEvent) => {
+    setWorkflow(event.target.value)
+  }
+
+  // Sends Workflow form
+  async function runWorkflowHandler() {
+    setLoading(true)
+    setProgress(0)
+    try {
+      const res = await runWorkflowAPI(workflow, acceptedFiles[0])
+      setEventId(res.eventId)
+    } catch (error) {
+      setLoading(false)
+      dispatch(
+        setMessage({
+          type: MessageTypeEnum.ERROR,
+          text: `Error: Make sure workflow is properly connected from start to end`,
+        }),
+      )
+    }
+  }
+
+  //$ Use Effects .
   useEffect(() => {
     async function apiCall() {
       try {
@@ -55,26 +82,7 @@ export default function SelectWorkflowForm({
     apiCall()
   }, [])
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setWorkflow(event.target.value)
-  }
-
-  async function runWorkflowHandler() {
-    setLoading(true)
-    setProgress(0)
-    try {
-      const res = await runWorkflowAPI(workflow, acceptedFiles[0])
-      setEventId(res.eventId)
-    } catch (error) {
-      setLoading(false)
-      dispatch(
-        setMessage({
-          type: MessageTypeEnum.ERROR,
-          text: `Error: Make sure workflow is properly connected from start to end`,
-        }),
-      )
-    }
-  }
+  //$ JSX .
   return (
     <div className=" flex justify-center items-center gap-5 h-[2rem] sm:h-[4rem]">
       <div className="text-xs sm:text-base">Select Wrokflow : </div>
