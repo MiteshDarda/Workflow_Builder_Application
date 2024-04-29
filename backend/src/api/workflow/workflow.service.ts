@@ -25,9 +25,7 @@ export class WorkflowService {
   ) {}
 
   //$ Track of sse in progress .
-  sseAvailable = {
-    // '1': 99,
-  };
+  sseAvailable = {};
 
   //* Create new Workflow .
   async create(body: CreateWorkflowDto) {
@@ -143,6 +141,7 @@ export class WorkflowService {
       nodes[node?.id] = node?.title;
     });
     const edges = {};
+    // from -> to
     completeWorkflow?.edges?.filter((edge: any) => {
       edges[edge?.source] = edge?.target;
     });
