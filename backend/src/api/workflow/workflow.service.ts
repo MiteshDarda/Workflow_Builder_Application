@@ -8,9 +8,7 @@ import { EdgeEntity } from './entities/edge.entity';
 import { workflowNodesConstant } from 'src/common/constants/workflow-node-constants';
 import { Observable, interval, map } from 'rxjs';
 import { MessageEvent } from './workflow.controller';
-import { parse } from 'csv-parse';
-import { Parser } from '@json2csv/plainjs';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { start_node } from './nodes/start_node';
 
 @Injectable()
 export class WorkflowService {
@@ -113,13 +111,13 @@ export class WorkflowService {
 
   //* Run Workflow .
   async run(id: number, file: File) {
-    const workflow = await this.findOne(id);
-    if (!workflow)
-      throw new HttpException(
-        { message: 'workflow doesnt exists' },
-        HttpStatus.BAD_REQUEST,
-      );
     try {
+      const workflow = await this.findOne(id);
+      if (!workflow)
+        throw new HttpException(
+          { message: 'workflow doesnt exists' },
+          HttpStatus.BAD_REQUEST,
+        );
       const completeWorkflow = await this.workflowEntity
         .createQueryBuilder('workflow')
         .where('workflow.id = :id', { id })
@@ -127,174 +125,80 @@ export class WorkflowService {
         .leftJoinAndSelect('workflow.edges', 'edges')
         .getOne();
 
-      return this.toGraph(completeWorkflow, file);
+      return await this.toGraph(completeWorkflow, file);
     } catch (error) {
-      console.log(error);
+      console.log('>>>', error);
       throw error;
     }
   }
 
   // $ Convert To Graph Run Workflow Helper .
   async toGraph(completeWorkflow: any, file: File) {
-    const nodes = {};
-    completeWorkflow?.nodes?.filter((node: any) => {
-      nodes[node?.id] = node?.title;
-    });
-    const edges = {};
-    // from -> to
-    completeWorkflow?.edges?.filter((edge: any) => {
-      edges[edge?.source] = edge?.target;
-    });
-    const [startNode] = completeWorkflow?.nodes.filter((node: any) => {
-      return node.title === workflowNodesConstant.START;
-    });
+    try {
+      const nodes = {};
+      completeWorkflow?.nodes?.filter((node: any) => {
+        nodes[node?.id] = node?.title;
+      });
+      const edges = {};
+      // from -> to
+      completeWorkflow?.edges?.filter((edge: any) => {
+        edges[edge?.source] = edge?.target;
+      });
+      const [startNode] = completeWorkflow?.nodes.filter((node: any) => {
+        return node.title === workflowNodesConstant.START;
+      });
 
-    const graph = [];
-    let nodeI = startNode.id;
-    while (nodeI) {
-      graph.push(nodeI);
-      nodeI = edges[nodeI];
+      const graph = [];
+      let nodeI = startNode.id;
+      while (nodeI) {
+        graph.push(nodeI);
+        nodeI = edges[nodeI];
+      }
+
+      if (
+        !startNode ||
+        nodes[graph[graph.length - 1]] !== workflowNodesConstant.END
+      )
+        throw new HttpException(
+          'Workflow Do not have proper Start and End Node',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+
+      const eventId = Date.now();
+      this.runGraph(graph, nodes, eventId, file);
+      return { eventId };
+    } catch (error) {
+      throw error;
     }
-
-    if (
-      !startNode ||
-      nodes[graph[graph.length - 1]] !== workflowNodesConstant.END
-    )
-      throw new HttpException(
-        'Workflow Do not have proper Start and End Node',
-        HttpStatus.NOT_ACCEPTABLE,
-      );
-
-    const time = Date.now();
-    this.runGraph(graph, nodes, time, file);
-    return { eventId: time };
   }
 
   //$ Run Graph Nodes Run Workflow Helper .
-  async runGraph(graph: any[], nodes: any, time: number, file: File | any) {
-    this.sseAvailable[time] = { completedPercentage: 1, completed: [] };
-
-    for (const node of graph) {
-      const i = graph.indexOf(node);
-      const completedPercentage = ((i + 1) * 100) / graph.length;
-      const latestCompleted = nodes[node];
-      let fileJson = null;
-
-      // Start
-      if (nodes[node] === workflowNodesConstant.START) {
-        // start
-      }
-      // Filter
-      if (nodes[node] === workflowNodesConstant.FILTER) {
-        file = await this.csvParseLowercase(file);
-        const opts = {};
-        const parser = await new Parser(opts);
-        file = await parser.parse(file);
-        console.log('lowercase', file);
-      }
-      // Convert
-      if (nodes[node] === workflowNodesConstant.CONVERT) {
-        fileJson = await this.csvToJson(file);
-        console.log('JSON', fileJson);
-        // CSV to JSON
-      }
-      // Post
-      if (nodes[node] === workflowNodesConstant.POST) {
-        if (fileJson) await this.postData(fileJson);
-        else {
-          const json = await this.csvToJson(file);
-          await this.postData(json);
-        }
-        // POST Req
-      }
-      // Wait
-      if (nodes[node] === workflowNodesConstant.WAIT) {
-        // delay of 5s
-        await this.delay(5);
-      }
-      // End
-      if (nodes[node] === workflowNodesConstant.END) {
-        // end
-      }
-
-      this.sseAvailable[time]?.completed?.push(nodes[node]);
-      this.sseAvailable[time] = {
-        ...this.sseAvailable[time],
-        completedPercentage,
-        latestCompleted,
-      };
-    }
-  }
-
-  //$ Post Request .
-  async postData(fileJson: any): Promise<void> {
+  async runGraph(graph: any[], nodes: any, eventId: number, file: File | any) {
     try {
-      const data = JSON.stringify({
-        data: fileJson,
-      });
-
-      const config: AxiosRequestConfig = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'https://workflow-builder.requestcatcher.com/test',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: data,
+      this.sseAvailable[eventId] = {
+        completedPercentage: 1,
+        completed: [],
+        error: false,
+        errorMessage: '',
       };
 
-      const response: AxiosResponse = await axios.request(config);
-      console.log(JSON.stringify(response.data));
+      graph = graph.map((node) => nodes[node]);
+
+      const req = {
+        eventId,
+        file,
+        graph,
+        currentNodeIndex: 0,
+        eventProgress: this.sseAvailable[eventId],
+      };
+      const res = {};
+      return await start_node(res, req, graph[1]);
     } catch (error) {
+      // throw error;
+      this.sseAvailable[eventId].error = true;
+      this.sseAvailable[eventId].errorMessage = error;
       console.log(error);
     }
-  }
-
-  //$ Delay Function .
-  async delay(s: number) {
-    const ms = s * 1000;
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  //$ Each Csv Column to LowerCase .
-  async csvParseLowercase(file: any): Promise<any[]> {
-    return new Promise((resolve, reject) => {
-      const result = [];
-      parse(file.buffer, (err, data) => {
-        if (err) {
-          console.error('Error parsing CSV:', err);
-          reject(err);
-          return;
-        }
-        data.forEach((row: any) => {
-          Object.keys(row).forEach((key: string) => {
-            row[key] = row[key].toLowerCase();
-          });
-          result.push(row);
-        });
-        resolve(result); // Resolve the promise with the modified data
-      });
-    });
-  }
-
-  //$ CSV to JSON .
-  async csvToJson(file: any) {
-    return new Promise((resolve, reject) => {
-      parse(
-        file,
-        {
-          columns: true, // Treats the first row as headers
-          skip_empty_lines: true, // Skip empty lines
-        },
-        (err, data) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve(data);
-        },
-      );
-    });
   }
 
   //* SSE .
@@ -302,10 +206,16 @@ export class WorkflowService {
     return interval(1000).pipe(
       map(() => {
         if (this.sseAvailable[eventId]) {
-          return {
-            data: this.sseAvailable[eventId],
-            type: '',
-          } as MessageEvent;
+          if (this.sseAvailable[eventId].error) {
+            return {
+              data: this.sseAvailable[eventId],
+              type: 'error',
+            } as MessageEvent;
+          } else
+            return {
+              data: this.sseAvailable[eventId],
+              type: '',
+            } as MessageEvent;
         } else
           return { data: { hello: 'world' }, type: 'close' } as MessageEvent;
       }),

@@ -53,14 +53,19 @@ export default function SelectWorkflowForm({
     try {
       const res = await runWorkflowAPI(workflow, acceptedFiles[0])
       setEventId(res.eventId)
-    } catch (error) {
+    } catch (error: any) {
+      let message = `Error: Make sure workflow is properly connected from start to end`
+      if (error.code === 'ERR_NETWORK') {
+        message = 'Internal Server Error'
+      }
       setLoading(false)
       dispatch(
         setMessage({
           type: MessageTypeEnum.ERROR,
-          text: `Error: Make sure workflow is properly connected from start to end`,
+          text: message,
         }),
       )
+      console.log('>>>>>>>>', error)
     }
   }
 

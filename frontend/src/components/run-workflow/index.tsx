@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import DragDrop from './Helper/DragDrop'
 import SelectWorkflowForm from './Helper/SelectWorkflowForm'
 import { LinearProgress } from '@mui/material'
+import { useDispatch } from 'react-redux'
+import { setMessage } from '../../store/reducers/message-slice'
+import { MessageTypeEnum } from '../../store/reducers/enums/message-type-enum'
 
 export default function RunWorkflow() {
   //$ Constants .
@@ -12,6 +15,7 @@ export default function RunWorkflow() {
   const [eventId, setEventId] = useState<number | null>(null)
   const [progress, setProgress] = useState(0)
   const [completedWork, setCompletedWork] = useState([])
+  const dispatch = useDispatch()
 
   //$ Use Effect .
   useEffect(() => {
@@ -19,9 +23,23 @@ export default function RunWorkflow() {
     setLoading(true)
     const eventSource = new EventSource(`${api}/workflow/sse/${eventId}`)
     eventSource.onopen = () => console.log('Connection established')
-    eventSource.onerror = (error) => {
-      eventSource?.close()
+    eventSource.onerror = (error: any) => {
+      setProgress(0)
       setLoading(false)
+      setCompletedWork([])
+      setEventId(null)
+      let messageText = 'Internal Server Error'
+      if (error?.data) {
+        const response = JSON.parse(error.data)
+        messageText = response.errorMessage.message
+      }
+      dispatch(
+        setMessage({
+          type: MessageTypeEnum.ERROR,
+          text: messageText,
+        }),
+      )
+      eventSource?.close()
       console.error('EventSource error:', error)
     }
 
@@ -87,9 +105,11 @@ export default function RunWorkflow() {
         </div>
         <div>
           <LinearProgress
+            variant="buffer"
             sx={{ height: '1rem', width: '80vw', borderRadius: '0.5rem' }}
-            variant="determinate"
+            // variant="determinate"
             value={progress}
+            valueBuffer={Math.min(100, progress)}
           />
         </div>
       </div>
